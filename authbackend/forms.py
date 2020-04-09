@@ -20,7 +20,27 @@ class OTPAuthenticationForm(AuthenticationForm):
             del self.request.session['_otp']
         else:
             # There is no OTP so create one and send it by email
-            otp = "1234"
+
+            import math, random
+
+            # function to generate OTP
+            def generateOTP():
+
+                # Declare a digits variable
+                # which stores all digits
+                digits = "0123456789"
+                OTP = ""
+
+                # length of password can be chaged
+                # by changing value in range
+                for i in range(4):
+                    OTP += digits[math.floor(random.random() * 10)]
+
+                return OTP
+
+                # Driver code
+
+            otp = generateOTP()
             send_mail(
                 subject="Your OTP Password",
                 message="Your OTP password is %s" % otp,
@@ -51,6 +71,66 @@ class UserRegistrationForm(forms.Form):
         max_length=32,
         widget=forms.PasswordInput()
     )
+
+
+class UserLoginForm(forms.Form):
+    username = forms.CharField(
+        required=True,
+        label='Username',
+        max_length=32
+    )
+    password = forms.CharField(
+        required=True,
+        label='Password',
+        max_length=32,
+        widget=forms.PasswordInput()
+    )
+
+    def clean(self):
+        super(UserLoginForm, self).clean()
+
+        import math, random
+        # function to generate OTP
+        def generateOTP():
+
+            # Declare a digits variable
+            # which stores all digits
+            digits = "0123456789"
+            OTP = ""
+
+            # length of password can be chaged
+            # by changing value in range
+            for i in range(4):
+                OTP += digits[math.floor(random.random() * 10)]
+
+            return OTP
+
+            # Driver code
+
+        user = User.objects.get(username=self.cleaned_data.get('username'))
+        otp = generateOTP()
+        send_mail(
+            subject="Your OTP Password",
+            message="Your OTP password is %s" % otp,
+            from_email='info@xeoscript.com',
+            recipient_list=[user.email]
+        )
+        # Now we trick form to be invalid
+
+
+
+class OTPForm(forms.Form):
+    otp = forms.CharField(
+        required=True,
+        label='OTP',
+        max_length=32
+    )
+
+
+
+
+
+
 
 
 # class SignUpForm(UserCreationForm):
